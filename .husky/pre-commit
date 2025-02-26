@@ -1,0 +1,9 @@
+# pre-commit
+
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run the pre-commit hook
+npx --no-install -- lint-staged
+
+

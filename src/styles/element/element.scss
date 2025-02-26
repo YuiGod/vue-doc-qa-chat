@@ -1,0 +1,76 @@
+// el-table 表格样式
+.el-table {
+  flex: 1;
+
+  // 修复 safari 浏览器表格错位 https://github.com/HalseySpicy/Geeker-Admin/issues/83
+  table {
+    width: 100%;
+  }
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  .el-table__header th {
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  .el-table__row {
+    font-size: 14px;
+
+    .move {
+      cursor: move;
+
+      .el-icon {
+        cursor: move;
+      }
+    }
+  }
+
+  // 设置 el-table 中 header 文字不换行，并省略
+  /* stylelint-disable-next-line selector-class-pattern */
+  .el-table__header .el-table__cell > .cell {
+    white-space: wrap;
+  }
+
+  // 解决表格数据为空时样式不居中问题(仅在element-plus中)
+  /* stylelint-disable-next-line selector-class-pattern */
+  .el-table__empty-block {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    .table-empty {
+      line-height: 30px;
+    }
+  }
+
+  // table 中 image 图片样式
+  .table-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+}
+
+// el-dialog 自定义弹窗样式
+.el-dialog {
+  &__header {
+    height: 54px;
+    padding: 0;
+    margin-right: 0 !important;
+    border-bottom: 1px solid var(--el-border-color);
+  }
+
+  &__body {
+    padding: 0 !important;
+  }
+
+  &__footer {
+    border-top: 1px solid var(--el-border-color);
+  }
+
+  &__headerbtn {
+    top: 0;
+  }
+}

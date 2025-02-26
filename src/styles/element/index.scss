@@ -1,0 +1,25 @@
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': #80752c
+    )
+  ),
+  $header: (
+    'height': 60px
+  ),
+  $footer: (
+    'height': 30px
+  ),
+  $table: (
+    'header-bg-color': var(--el-fill-color-light),
+    'header-text-color': var(--el-text-color-primary)
+  ),
+  $table-padding: (
+    'large': 16px 0,
+    'default': 12px 0,
+    'small': 4px 0
+  )
+);
+
+// 自定义覆盖 elementplus 组件样式，补充上面所没有的样式定义
+@use './element.scss' as *;

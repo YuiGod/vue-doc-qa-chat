@@ -1,0 +1,7 @@
+node_modules
+src/uni_modules/
+src/static/
+dist/
+
+src/styles/markdown/
+**/*.svg
