@@ -10,17 +10,6 @@ export enum ResultEnum {
 }
 
 /**
- * @description：请求方法
- */
-export enum RequestEnum {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE'
-}
-
-/**
  * @description：常用的 contentTyp 类型
  */
 export enum ContentTypeEnum {

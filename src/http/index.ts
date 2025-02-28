@@ -1,4 +1,3 @@
-import { RequestEnum } from '@/enums/httpEnum'
 import axiosRequest from './axios/config'
 import { fetchRequest } from './fetch/config'
 import { cancelAllRequest, cancelRequest } from './helper/abortController'
@@ -75,8 +74,18 @@ export default {
    * @param config Fetch config 配置
    * @returns Promise
    */
+  fetchPost<T>(url: string, data?: object, config: FetchConfig = {}): Promise<ResultData<T>> {
+    return fetchRequest<ResultData<T>>(url, { method: 'POST', data, ...config })
+  },
+  /**
+   * Fetch 对话 Post 请求，专门为 `Chat` 配置，启动流式响应
+   * @param url url
+   * @param params param 请求参数
+   * @param config Fetch config 配置
+   * @returns Promise
+   */
   fetchPostChat<T>(url: string, data?: object, config: FetchConfig = {}): Promise<T> {
-    return fetchRequest<T>(url, { method: RequestEnum.POST, data, ...config })
+    return fetchRequest<T>(url, { method: 'POST', data, ...config })
   },
   /**
    * 匹配 url 取消请求

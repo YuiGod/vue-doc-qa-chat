@@ -46,8 +46,8 @@ export interface FetchConfig<D = any> extends RequestInit {
   timeout?: number
   /**
    * `cancel` 控制是否取消重复的请求，默认为true。
-   * true：重复请求需要取消，对于不小心连续触发多个相同的请求的情况，取消重复的请求
-   * false：重复请求不需要取消
+   * @description `true`：取消重复请求，对于不小心连续触发多个相同的请求的情况，可以取消重复的请求。
+   * @description `false`：不取消重复请求。
    */
   cancel?: boolean
   /**
@@ -90,7 +90,7 @@ export interface FetchResponse<D = any> extends Response {
  * 请求响应参数（不包含data）
  */
 export interface Result {
-  code: string
+  code: number
   message: string
 }
 

@@ -3,7 +3,8 @@ import type { FetchConfig, FetchResponse } from '../types'
 import InterceptorManager from './InterceptorManager'
 import { checkStatus } from '../helper/checkStatus'
 import { addPending, removePending } from '../helper/abortController'
-import { ContentTypeEnum } from '@/enums/httpEnum'
+import { ContentTypeEnum, ResultEnum } from '@/enums/httpEnum'
+import HttpError from '../helper/httpError'
 
 /** 默认baseUrl */
 const PATH_URL = import.meta.env.VITE_API_BASEURL
@@ -13,7 +14,7 @@ const defaultConfig: FetchConfig = {
   /** 基本路径 */
   baseURL: PATH_URL,
   /** 请求超时时间 */
-  timeout: 5000,
+  timeout: ResultEnum.TIMEOUT as number,
   headers: {
     'Content-Type': ContentTypeEnum.JSON
   }
@@ -27,16 +28,17 @@ function requestInterceptor<T>(interceptors: InterceptorManager<FetchConfig<T>>)
   // 添加请求拦截器
   interceptors.use({
     onFulfilled: config => {
-      // 重复请求不需要取消，在 api 服务中通过指定的第三个参数: { cancel: false } 来控制
+      // 取消重复的请求，需要当前url请求完成后，才会重新请求。
       config.cancel ??= true
-      // 在 AbortController 管理中添加该请求
+      // 请求开始，在 AbortController 管理中添加该请求
       config.cancel && addPending(config)
       return config
     },
     onRejected: error => {
-      return Promise.reject(error)
+      return Promise.reject(new HttpError(400, error.message))
     }
   })
+
   return interceptors
 }
 
@@ -50,8 +52,15 @@ function responseInterceptor<T>(interceptors: InterceptorManager<FetchResponse<T
   interceptors.use({
     onFulfilled: response => {
       if (!response.ok) {
-        return Promise.reject(checkStatus(response.status, false))
+        // 想要获取后端返回的错误信息，还需要 then 一次 response
+        // 与后端协商好返回的错误信息。
+        // 默认服务器返回错误对象必须含有 code 和 message 属性，如： {code: 500,message: '响应失败！'}
+        return Promise.reject(response.json())
+
+        // 如果不需要处理服务器返回的错误信息
+        // return Promise.reject(new HttpError(response.status, ''))
       }
+
       const { config } = response
       config && (fetchConfig = config)
 
@@ -72,18 +81,27 @@ function responseInterceptor<T>(interceptors: InterceptorManager<FetchResponse<T
       }
       // 其他类型默认返回文本
       return response.text()
+    },
+    onRejected: error => {
+      // 处理除了 2xx 和 5xx 状态码的错误信息。
+      return Promise.reject(new HttpError(error.code || 400, error.message))
     }
   })
 
-  // 添加响应拦截器，处理最终的数据
+  /**
+   * 添加响应拦截器，处理最终的数据和错误信息。
+   */
   interceptors.use({
     onFulfilled: response => {
-      // 在 AbortController 管理中移除该请求
+      // 请求响应完成，在 AbortController 管理中移除该请求
       removePending(fetchConfig)
       return response
     },
-    onRejected: error => {
-      return Promise.reject(checkStatus(error.code))
+    onRejected: async error => {
+      // 处理服务器返回 5xx 的错误信息
+      const response = await error
+      // 统一处理 promise 链的 reject 错误。
+      return Promise.reject(checkStatus(response.code, response.message))
     }
   })
 
@@ -157,29 +175,27 @@ async function fetchRequest<T = any>(url: string, config: FetchConfig<T> = {}): 
   // 创建 Fetch Promise 链，流程：（请求拦截器 → Fetch请求 → 响应拦截器）
   let promise = Promise.resolve(mergedConfig)
 
-  // 处理请求拦截器数组--遍历所有的请求拦截器
   const requestInterceptorChain: any[] = []
   requestInterceptors.forEach(interceptor => {
-    requestInterceptorChain.unshift(interceptor.onFulfilled, interceptor.onRejected)
+    requestInterceptorChain.push(interceptor.onFulfilled, interceptor.onRejected)
   })
 
-  // 处理响应拦截器--遍历所有的响应拦截器
   const responseInterceptorChain: any[] = []
   responseInterceptors.forEach(interceptor => {
     responseInterceptorChain.push(interceptor.onFulfilled, interceptor.onRejected)
   })
 
-  // 将拦截器依次添加到 promise 链
+  // 将请求拦截器依次添加到 promise 链
   let i = 0
   while (i < requestInterceptorChain.length) {
     promise = promise.then(requestInterceptorChain[i++], requestInterceptorChain[i++])
   }
 
   // Fetch 请求添加到 promise 链
-  promise = promise.then(async config => {
-    const response = (await fetch(finalURL, config)) as FetchResponse
+  promise = promise.then(async newConfig => {
+    const response = (await fetch(finalURL, newConfig)) as FetchResponse
     // 将 config 添加到 FetchResponse 中，响应拦截器需要用到 confog
-    response.config = config
+    response.config = newConfig
     return response
   })
 

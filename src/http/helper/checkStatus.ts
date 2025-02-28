@@ -1,9 +1,10 @@
 /**
- * @description: 校验网络请求状态码
- * @param {Number} status
- * @return void
+ * 校验网络请求状态码
+ * @param status 状态码
+ * @param msg `类型为 string`：添加额外的信息。`类型为 boolean`：是否开启消息提示
+ * @param isAlert 是否开启消息提示
+ * @returns
  */
-
 export const checkStatus = (status: number, msg?: string | boolean, isAlert: boolean = true) => {
   let message = ''
   switch (status) {
@@ -11,12 +12,9 @@ export const checkStatus = (status: number, msg?: string | boolean, isAlert: boo
     case 20:
       message = '已取消请求。'
       ElMessage.warning(message)
-      return {
-        code: status,
-        message: message
-      }
+      return { code: status, message: message }
     case 400:
-      message = '请求失败！服务器没有进行新建或修改数据的操作。'
+      message = '请求失败！请求未提交到服务器。'
       break
     case 401:
       message = '登录失效！用户没有权限（令牌、用户名、密码错误）。'
@@ -25,7 +23,7 @@ export const checkStatus = (status: number, msg?: string | boolean, isAlert: boo
       message = '当前账号无权限访问！'
       break
     case 404:
-      message = '你所访问的资源不存在！'
+      message = '您所访问的资源不存在！'
       break
     case 405:
       message = '请求方式错误！'
@@ -34,7 +32,7 @@ export const checkStatus = (status: number, msg?: string | boolean, isAlert: boo
       message = '请求的格式不可得。'
       break
     case 408:
-      message = '请求超时！请您稍后重试'
+      message = '请求超时！请您稍后重试。'
       break
     case 500:
       message = '服务器发生错误，请检查服务器。'
@@ -55,10 +53,11 @@ export const checkStatus = (status: number, msg?: string | boolean, isAlert: boo
       message = '流式响应失败，无响应数据！'
       break
     default:
-      message = '请求失败！请联系管理员。'
+      message = '请求失败！'
   }
+
   if (typeof msg === 'string') {
-    message = msg
+    message += msg
   }
 
   if ((typeof msg === 'boolean' && msg === true && isAlert) || (typeof msg !== 'boolean' && isAlert)) {
