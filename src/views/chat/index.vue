@@ -268,7 +268,7 @@ onUnmounted(() => {
               maxlength="2000"
               show-word-limit
               @keydown.enter="inputKeyboard"
-              placeholder="请输入对话内容……（换行请使用 Ctrl/Shift + Enter，发送可使用 Enter）"
+              placeholder="请输入对话内容……"
             >
             </el-input>
 

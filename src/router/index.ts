@@ -38,6 +38,15 @@ const router = createRouter({
             icon: 'Warning'
           },
           component: () => import('@/views/test/index.vue')
+        },
+        {
+          path: '/test2',
+          name: 'test2',
+          meta: {
+            title: '测试2',
+            icon: 'Warning'
+          },
+          component: () => import('@/views/test/test2.vue')
         }
       ]
     }
