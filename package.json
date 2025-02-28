@@ -10,7 +10,9 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "eslint . --fix",
+    "lint": "eslint --fix --ext .js,.ts,.vue ./src",
+    "lint:prettier": "prettier --write \"src/**/*.{js,ts,json,tsx,css,less,scss,vue,html,md}\"",
+    "lint:stylelint": "stylelint --cache --fix \"**/*.{vue,less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "format": "prettier --write src/",
     "prepare": "husky"
   },
