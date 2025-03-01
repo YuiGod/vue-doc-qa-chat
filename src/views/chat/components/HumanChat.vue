@@ -43,7 +43,6 @@ const errorContent = computed(() => {
 .chat-human {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 10px;
   margin-left: 10%;
 
   .chat-container {
