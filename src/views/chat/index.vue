@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import HumanChat from './components/HumanChat.vue'
 import AssistantChat from './components/AssistantChat.vue'
-import { scrollToButtom } from '@/utils/common'
 import { chatApi, chatCancelRequest } from '@/api/chat'
 
 type Chat = {
@@ -21,7 +20,7 @@ const isWheelMove = ref(false)
 const humanInput = ref('')
 // 响应式对话，界面显示
 const chatting: Ref<Chat[]> = ref([])
-const chatMain = ref<HTMLDivElement>()
+const chatMainRef = ref<HTMLDivElement>()
 
 /**
  * 对话标题
@@ -86,10 +85,10 @@ const onSubmit = async () => {
   }
 
   isWheelMove.value = false
-  scrollToButtom(chatMain.value!)
+
+  scrollToButtom(chatMainRef.value!)
 
   let isThinking = false
-
   let buffer = ''
   // 请求后台 chat
   await chatApi(
@@ -109,7 +108,7 @@ const onSubmit = async () => {
           continue
         }
         const data = JSON.parse(line)
-        const content = data.message.content
+        const content = data.message.content as string
 
         // 截取 think 标签的内容
         if (content === '<think>') {
@@ -127,10 +126,15 @@ const onSubmit = async () => {
         } else {
           assistantChat.value.content += content
         }
+
+        if (content.indexOf('\n')) {
+          buffer = ''
+          scrollToButtom(chatMainRef.value!)
+        }
         buffer += content
 
         if (!isWheelMove.value && buffer.length >= 50) {
-          scrollToButtom(chatMain.value!)
+          scrollToButtom(chatMainRef.value!)
         }
 
         if (buffer.length >= 50) {
@@ -192,7 +196,7 @@ const onRestartNewChat = () => {
  * @param element 指定目标容器 Element
  * @param threshold 误差高度阈值
  */
-const isMoveToBottom = (element: HTMLElement | undefined, threshold: number = 1): boolean => {
+const isMoveToBottom = (element: HTMLDivElement | undefined, threshold: number = 1): boolean => {
   if (!element) {
     return false
   }
@@ -211,7 +215,7 @@ const handleWhell = () => {
  * 滚动条监听事件
  */
 const handleScroll = () => {
-  if (isMoveToBottom(chatMain.value)) {
+  if (isMoveToBottom(chatMainRef.value)) {
     isWheelMove.value = false
   }
 }
@@ -225,6 +229,16 @@ onUnmounted(() => {
   document.removeEventListener('wheel', handleWhell)
   document.removeEventListener('scroll', handleScroll)
 })
+
+function scrollToButtom(div: Element | null) {
+  if (div === null) {
+    return
+  }
+
+  nextTick(() => {
+    div.scrollTop = div.scrollHeight
+  })
+}
 </script>
 
 <template>
@@ -233,24 +247,22 @@ onUnmounted(() => {
       <span class="title">{{ chatTitle }}</span>
     </div>
 
-    <div ref="chatMain" class="chat-main">
+    <div ref="chatMainRef" class="chat-main">
       <div class="chat-content">
         <div class="chat">
-          <div class="chat-card-body">
-            <AssistantChat key="system" :content="'您好！我是贴心的小助手，有什么可以帮助您的吗？'"></AssistantChat>
-            <template v-for="(item, index) in chatting">
-              <HumanChat :key="index" v-if="item.role === 'user'" :content="item.content" :error="item.error"></HumanChat>
-              <AssistantChat
-                :key="index"
-                v-if="item.role === 'assistant'"
-                :content="item.content"
-                :think="item.think"
-                :is-stream="item.isStream"
-                :hasThinkCard="true"
-                :error="item.error"
-              ></AssistantChat>
-            </template>
-          </div>
+          <AssistantChat key="system" :content="'您好！我是贴心的小助手，有什么可以帮助您的吗？'"></AssistantChat>
+          <template v-for="(item, index) in chatting">
+            <HumanChat :key="index" v-if="item.role === 'user'" :content="item.content" :error="item.error"></HumanChat>
+            <AssistantChat
+              :key="index"
+              v-if="item.role === 'assistant'"
+              :content="item.content"
+              :think="item.think"
+              :is-stream="item.isStream"
+              :hasThinkCard="true"
+              :error="item.error"
+            ></AssistantChat>
+          </template>
         </div>
 
         <div class="chat-input-container">
@@ -302,12 +314,15 @@ onUnmounted(() => {
 .chat-container {
   position: absolute;
   inset: 0;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   background: linear-gradient(to bottom right, #fff9f6, 60%, #ebded3);
 
   .chat-header {
     display: flex;
+    flex: none;
     align-items: center;
     justify-content: center;
     height: 60px;
@@ -323,10 +338,11 @@ onUnmounted(() => {
   }
 
   .chat-main {
-    position: absolute;
-    inset: 60px 0 0;
+    position: relative;
     display: flex;
+    flex: 1;
     justify-content: center;
+    width: 100%;
     min-height: calc(100% - 60px);
     overflow: auto;
 
@@ -342,13 +358,7 @@ onUnmounted(() => {
         box-sizing: border-box;
         flex: 1;
         width: 100%;
-        padding: 0 20px;
-        padding-bottom: 30px;
-
-        .chat-card-body {
-          display: flex;
-          flex-direction: column;
-        }
+        padding: 0 20px 30px;
       }
 
       .chat-input-container {
