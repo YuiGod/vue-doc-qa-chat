@@ -25,7 +25,7 @@ export interface CustomAxiosBaseConfig {
 }
 /** axios 扩展参数配置 */
 export interface CustomAxiosConfig<D = any> extends CustomAxiosBaseConfig, AxiosRequestConfig<D> {}
-/** axios 扩展参数配置 */
+/** axios 拦截器扩展参数配置 */
 export interface CustomAxiosInterceptorsConfig<D = any> extends CustomAxiosBaseConfig, InternalAxiosRequestConfig<D> {}
 
 /**

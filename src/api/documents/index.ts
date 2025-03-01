@@ -1,4 +1,4 @@
-import type { ResultData } from '@/http/types'
+import type { CustomAxiosConfig, ResultData } from '@/http/types'
 import type { DocParamsType, ResponseDocPageType } from './types'
 import http from '@/http'
 
@@ -6,12 +6,12 @@ const docPageApi = (params: DocParamsType): Promise<ResultData<ResponseDocPageTy
   return http.get('/documentQA/queryDoc', params)
 }
 
-const docAddApi = (data: FormData): Promise<ResultData<string>> => {
-  return http.post('/documentQA/addDoc', data)
+const docAddApi = (data: FormData, config?: CustomAxiosConfig): Promise<ResultData<string>> => {
+  return http.post('/documentQA/addDoc', data, config)
 }
 
-const docEditApi = (data: FormData): Promise<ResultData<string>> => {
-  return http.post('/documentQA/editDoc', data)
+const docEditApi = (data: FormData, config?: CustomAxiosConfig): Promise<ResultData<string>> => {
+  return http.post('/documentQA/editDoc', data, config)
 }
 
 const docDeleteApi = (data: string): Promise<ResultData<string>> => {

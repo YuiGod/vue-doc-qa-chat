@@ -3,31 +3,31 @@ import type { FormInstance, FormRules, UploadInstance, UploadProps, UploadRawFil
 import type { DocTableType } from '@/api/documents/types'
 import { BaseDialog } from '@/components/Dialog'
 import { UploadFilled } from '@element-plus/icons-vue'
-import { type PropType, reactive, ref, toRaw } from 'vue'
+import { reactive, ref, toRaw } from 'vue'
 import { docAddApi, docEditApi } from '@/api/documents/index'
+import type { AxiosProgressEvent } from 'axios'
 
-const props = defineProps({
-  currentRow: {
-    type: Object as PropType<DocTableType | null>,
-    default: () => null
-  },
-  open: {
-    type: Boolean,
-    required: false,
-    default: false
-  }
-})
+/** props */
+interface Props {
+  /** 文件 */
+  currentRow: DocTableType | null
+  /** 弹窗显隐 */
+  open: boolean
+}
+
+const { currentRow, open } = defineProps<Props>()
 
 // 判断弹窗表单是新增，还是编辑
-const isEdit = props.currentRow == null ? false : true
+const isEdit = currentRow == null ? false : true
 /**
  * ok: 表单提交成功后的回调
  * closed: 	Dialog 关闭动画结束时的回调
  */
 const emit = defineEmits(['ok', 'closed'])
 const loading = ref(false)
-const visible = ref(props.open)
-
+const visible = ref(open)
+// 上传文件进度条
+const uploadProgress = ref(0)
 const uploadRef = ref<UploadInstance>()
 // 要上传的文件 Blob，因为是单文件上传，所以不需要数组
 let docFile: File | null = null
@@ -35,8 +35,8 @@ let docFile: File | null = null
 const fileList = isEdit
   ? ref<UploadUserFile[]>([
       {
-        name: props.currentRow?.fileName || '新建文件.pdf',
-        url: props.currentRow?.filePath
+        name: currentRow?.fileName || '新建文件.pdf',
+        url: currentRow?.filePath
       }
     ])
   : ref<UploadUserFile[]>([])
@@ -46,7 +46,7 @@ const docFormRef = ref<FormInstance>()
 
 // 初始化表单数据，数据赋值
 const docForm = isEdit
-  ? reactive<DocTableType>(props.currentRow as DocTableType)
+  ? reactive<DocTableType>(currentRow!)
   : reactive<DocTableType>({
       id: '',
       name: '',
@@ -64,14 +64,36 @@ const rules = reactive<FormRules<DocTableType>>({
 })
 
 /**
+ * 检查文件类型，只通过后缀为 pdf， txt，doc，docx，md 的文件
+ * @param type 文件类型
+ */
+const checkFileType = (type: string, fileName: string): boolean => {
+  if (
+    type === 'application/pdf' ||
+    type === 'text/plain' ||
+    type === 'application/msword' ||
+    type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ) {
+    return true
+  }
+
+  const split = fileName.split('.')
+  if (split.length >= 2 && split[split.length - 1] === 'md') {
+    return true
+  }
+
+  return false
+}
+
+/**
  * 单一文件上传，重新选择时，覆盖替换前一个文件
  * @param files 上传文件列表
  */
 const uploadOnExceed: UploadProps['onExceed'] = files => {
   const file = files[0] as UploadRawFile
 
-  if (file.type !== 'application/pdf') {
-    ElMessage.error('请上传正确的 pdf 文件！')
+  if (!checkFileType(file.type, file.name)) {
+    ElMessage.error('请上传正确的文件！')
     return
   }
   uploadRef.value!.clearFiles()
@@ -79,9 +101,14 @@ const uploadOnExceed: UploadProps['onExceed'] = files => {
 }
 
 const uploadOnChange: UploadProps['onChange'] = uploadFile => {
-  if (uploadFile.raw?.type !== 'application/pdf') {
+  if (!uploadFile.raw) {
+    ElMessage.error('请上传正确的文件！')
+    return
+  }
+  const type = uploadFile.raw.type
+  if (!checkFileType(type, uploadFile.name)) {
     uploadRef.value!.clearFiles()
-    ElMessage.error('请上传正确的 pdf 文件！')
+    ElMessage.error('请上传正确的文件！')
     return
   }
   docFile = uploadFile.raw
@@ -93,6 +120,17 @@ const uploadOnRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
     docForm.fileName = ''
     docFile = null
   }
+}
+
+/**
+ * axios 进度条监听
+ * @param event AxiosProgressEvent
+ */
+const onProgress = (event: AxiosProgressEvent) => {
+  if (!event.total) {
+    return
+  }
+  uploadProgress.value = Math.round((event.loaded * 100) / event.total)
 }
 
 /**
@@ -110,9 +148,11 @@ const submitApi = async () => {
     formData.append(key, doc[key as keyof DocTableType])
   })
   // 请求后台提交表单
-  isEdit
-    ? await docEditApi(formData).finally(() => (loading.value = false))
-    : await docAddApi(formData).finally(() => (loading.value = false))
+  if (isEdit) {
+    await docEditApi(formData, { onUploadProgress: onProgress }).finally(() => (loading.value = false))
+  } else {
+    await docAddApi(formData, { onUploadProgress: onProgress }).finally(() => (loading.value = false))
+  }
 
   emit('ok', doc)
   ElMessage.success('保存成功！')
@@ -159,7 +199,7 @@ const onClosed = () => {
           ref="uploadRef"
           action="#"
           drag
-          accept="application/pdf"
+          accept=".pdf, .txt, .doc, .docx, .md"
           :limit="1"
           v-model:file-list="fileList"
           :auto-upload="false"
@@ -169,7 +209,7 @@ const onClosed = () => {
           class="upload-card"
         >
           <el-icon class="upload-icon"><upload-filled /></el-icon>
-          <div class="upload-text">拖动或 <em>点击上传pdf文件</em></div>
+          <div class="upload-text">拖动或 <em>点击上传 .pdf，.txt，.doc，.docx，.md文件</em></div>
         </el-upload>
       </el-form-item>
     </el-form>
@@ -179,6 +219,18 @@ const onClosed = () => {
       <el-button @click="onClose(docFormRef)">关闭</el-button>
     </template>
   </BaseDialog>
+
+  <el-dialog
+    v-model="loading"
+    title="上传进度"
+    width="500"
+    append-to-body
+    :show-close="false"
+    :close-on-press-escape="false"
+    :close-on-click-modal="false"
+  >
+    <el-progress :text-inside="true" :stroke-width="24" :percentage="uploadProgress" />
+  </el-dialog>
 </template>
 
 <style lang="scss" scoped>

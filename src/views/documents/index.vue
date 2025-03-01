@@ -116,7 +116,7 @@ const onOk = () => {
     </div>
 
     <div class="card table-card">
-      <div class="mb10">
+      <div style="margin-bottom: 10px">
         <el-button type="primary" @click="onAdd">添加</el-button>
       </div>
 
@@ -146,7 +146,6 @@ const onOk = () => {
           </template>
         </el-table-column>
 
-        <!-- 无数据 -->
         <template #empty>
           <el-empty :image-size="100" />
         </template>
