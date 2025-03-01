@@ -6,13 +6,18 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #0003;
-  border-radius: 10px;
+  background-color: rgb(from var(--el-text-color-primary) r g b / 30%);
+  border-radius: 6px;
   transition: all 0.2s ease-in-out;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgb(from var(--el-text-color-primary) r g b / 50%);
+  }
 }
 
 ::-webkit-scrollbar-track {
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .mainl-white {

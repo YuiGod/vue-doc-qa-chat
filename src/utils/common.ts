@@ -1,5 +1,3 @@
-import { nextTick } from 'vue'
-
 /**
  * 生成 uuid
  * @returns
@@ -12,20 +10,4 @@ export function generateUUID() {
     return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
   })
   return uuid
-}
-
-/**
- * 滚动条，滚动到底部
- */
-export function scrollToButtom(div: Element | null) {
-  if (div === null) {
-    return
-  }
-  nextTick(() => {
-    const scroll = div
-    scroll.scrollTo({
-      top: scroll.scrollHeight,
-      behavior: 'smooth'
-    })
-  })
 }

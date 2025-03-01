@@ -18,6 +18,10 @@
     'large': 16px 0,
     'default': 12px 0,
     'small': 4px 0
+  ),
+  $scrollbar: (
+    'bg-color': var(--el-text-color-primary),
+    'hover-bg-color': var(--el-text-color-primary)
   )
 );
 
