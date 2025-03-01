@@ -55,13 +55,6 @@
 
 // el-dialog 自定义弹窗样式
 .el-dialog {
-  &__header {
-    height: 54px;
-    padding: 0;
-    margin-right: 0 !important;
-    border-bottom: 1px solid var(--el-border-color);
-  }
-
   &__body {
     padding: 0 !important;
   }

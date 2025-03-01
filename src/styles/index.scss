@@ -23,18 +23,17 @@
 
 .main-full {
   width: 100%;
-  height: calc(100vh - var(--el-header-height) - var(--el-footer-height));
+  height: calc(100vh - var(--el-header-height) - var(--el-footer-height) - var(--app-content-padding) * 2);
 }
 
 .main-full-white {
   width: 100%;
-  height: calc(100vh - var(--el-header-height) - var(--el-footer-height));
+  height: calc(100vh - var(--el-header-height) - var(--el-footer-height) - var(--app-content-padding) * 2);
   background-color: white;
 }
 
 // 卡片
 .card {
-  box-sizing: border-box;
   padding: 20px;
   overflow-x: hidden;
   background-color: var(--el-bg-color);

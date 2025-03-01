@@ -64,7 +64,7 @@ watch(
 const dialogStyle = computed(() => {
   return {
     height: unref(dialogHeight),
-    padding: '15px'
+    padding: '10px 0'
   }
 })
 </script>
@@ -127,8 +127,9 @@ const dialogStyle = computed(() => {
   .dialog-header {
     display: flex;
     align-items: center;
-    height: 54px;
+    height: 40px;
     padding: 0 15px;
+    border-bottom: 1px solid var(--el-border-color);
 
     .title {
       flex: 1;
@@ -141,7 +142,7 @@ const dialogStyle = computed(() => {
       right: 0;
       display: flex;
       align-items: center;
-      height: 54px;
+      height: 40px;
     }
   }
 }
