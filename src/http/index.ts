@@ -14,7 +14,7 @@ export default {
    * @param config Axios config 配置
    * @returns `Promise<ResultData<T>>`
    */
-  get<T>(url: string, params?: object, config: CustomAxiosConfig = {}): Promise<ResultData<T>> {
+  get<T>(url: string, params?: object, config: CustomAxiosConfig = {}): Promise<T> {
     return axiosRequest.get(url, { params, ...config })
   },
   /**
@@ -24,7 +24,7 @@ export default {
    * @param config Axios config 配置
    * @returns `Promise<ResultData<T>>`
    */
-  post<T>(url: string, data?: object | string, config: CustomAxiosConfig = {}): Promise<ResultData<T>> {
+  post<T>(url: string, data?: object | string, config: CustomAxiosConfig = {}): Promise<T> {
     return axiosRequest.post(url, data, config)
   },
   /**
@@ -40,12 +40,12 @@ export default {
   /**
    * Axios delete 请求
    * @param url url
-   * @param params param 请求参数
+   * @param data data 请求参数，通常是id
    * @param config Axios config 配置
    * @returns `Promise<ResultData<T>>`
    */
-  delete<T>(url: string, params?: any, config: CustomAxiosConfig = {}): Promise<ResultData<T>> {
-    return axiosRequest.delete(url, { params, ...config })
+  delete<T>(url: string, data?: any, config: CustomAxiosConfig = {}): Promise<ResultData<T>> {
+    return axiosRequest.delete(url, { data, ...config })
   },
   /**
    * Axios download 下载请求，responseType: blob

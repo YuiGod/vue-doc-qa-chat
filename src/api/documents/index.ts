@@ -3,19 +3,27 @@ import type { DocParamsType, ResponseDocPageType } from './types'
 import http from '@/http'
 
 const docPageApi = (params: DocParamsType): Promise<ResultData<ResponseDocPageType>> => {
-  return http.get('/documentQA/queryDoc', params)
+  return http.get('/documents/pageDoc', params)
 }
 
 const docAddApi = (data: FormData, config?: CustomAxiosConfig): Promise<ResultData<string>> => {
-  return http.post('/documentQA/addDoc', data, config)
+  return http.post('/documents/addDoc', data, config)
 }
 
 const docEditApi = (data: FormData, config?: CustomAxiosConfig): Promise<ResultData<string>> => {
-  return http.post('/documentQA/editDoc', data, config)
+  return http.put('/documents/editDoc', data, config)
 }
 
-const docDeleteApi = (data: string): Promise<ResultData<string>> => {
-  return http.post('/documentQA/delDoc', data)
+const docDeleteApi = (id: string): Promise<ResultData<string>> => {
+  return http.delete('/documents/delDoc', { id: id })
 }
 
-export { docPageApi, docAddApi, docEditApi, docDeleteApi }
+const docReadApi = (id: string): Promise<Blob> => {
+  return http.get('/documents/read', { id: id })
+}
+
+const docVectorAllApi = (config?: CustomAxiosConfig): Promise<ResultData<string>> => {
+  return http.get('/documents/vector-all', undefined, config)
+}
+
+export { docPageApi, docAddApi, docEditApi, docDeleteApi, docReadApi, docVectorAllApi }

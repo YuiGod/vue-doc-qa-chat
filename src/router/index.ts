@@ -25,8 +25,8 @@ const router = createRouter({
           path: '/documents',
           name: 'documents',
           meta: {
-            title: '上传文档',
-            icon: 'Document'
+            title: '文档管理',
+            icon: 'FolderOpened'
           },
           component: () => import('@/views/documents/index.vue')
         },
@@ -34,8 +34,8 @@ const router = createRouter({
           path: '/test',
           name: 'test',
           meta: {
-            title: 'md主题测试',
-            icon: 'Warning'
+            title: 'md主题预览',
+            icon: 'Tickets'
           },
           component: () => import('@/views/test/index.vue')
         },

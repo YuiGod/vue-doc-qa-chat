@@ -286,10 +286,10 @@ function scrollToButtom(div: Element | null) {
 
             <div class="bottom-send">
               <el-button v-if="isStream" type="primary" plain round @click="onCancelRequest">
-                <Stop size="20px" />
+                <StopIcon size="20px" />
               </el-button>
               <el-button v-else type="primary" plain round :loading="loading" :disabled="disabled" @click="onSubmit">
-                <Send size="20px" />
+                <SendIcon size="20px" />
               </el-button>
             </div>
 

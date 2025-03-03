@@ -1,13 +1,13 @@
 interface DocParamsType {
-  pageNum: number
-  pageSize: number
+  page_num: number
+  page_size: number
   id?: string
   name?: string
 }
 
 interface ResponseDocPageType {
-  pageNum: number
-  pageSize: number
+  page_num: number
+  page_size: number
   total: number
   list: DocTableType[]
 }
@@ -15,8 +15,10 @@ interface ResponseDocPageType {
 interface DocTableType {
   id: string
   name: string
-  fileName: string
-  filePath: string
+  file_name: string
+  file_path: string
+  suffix: string
+  vector: string
   date: string
 }
 

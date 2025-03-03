@@ -4,7 +4,9 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+// 重置默认样式
 import '@/styles/reset.scss'
+// markdown 样式
 import '@/styles/markdown/mdmdt-light.scss'
 import '@/styles/markdown/plugins.scss'
 // elementplus 自定义样式

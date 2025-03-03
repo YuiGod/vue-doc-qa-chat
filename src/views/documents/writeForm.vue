@@ -19,6 +19,8 @@ const { currentRow, open } = defineProps<Props>()
 
 // 判断弹窗表单是新增，还是编辑
 const isEdit = currentRow == null ? false : true
+
+const title = isEdit ? '编辑' : '新增'
 /**
  * ok: 表单提交成功后的回调
  * closed: 	Dialog 关闭动画结束时的回调
@@ -35,8 +37,8 @@ let docFile: File | null = null
 const fileList = isEdit
   ? ref<UploadUserFile[]>([
       {
-        name: currentRow?.fileName || '新建文件.pdf',
-        url: currentRow?.filePath
+        name: currentRow?.file_name || '新建文件.txt',
+        url: currentRow?.file_path
       }
     ])
   : ref<UploadUserFile[]>([])
@@ -50,8 +52,10 @@ const docForm = isEdit
   : reactive<DocTableType>({
       id: '',
       name: '',
-      fileName: '',
-      filePath: '',
+      file_name: '',
+      file_path: '',
+      suffix: '',
+      vector: '',
       date: ''
     })
 
@@ -60,7 +64,7 @@ const docForm = isEdit
  */
 const rules = reactive<FormRules<DocTableType>>({
   name: [{ required: true, message: '请输入文件名称！', trigger: 'blur' }],
-  fileName: [{ required: true, message: '请上传文件！', trigger: 'change' }]
+  file_name: [{ required: true, message: '请上传文件！', trigger: 'change' }]
 })
 
 /**
@@ -112,12 +116,12 @@ const uploadOnChange: UploadProps['onChange'] = uploadFile => {
     return
   }
   docFile = uploadFile.raw
-  docForm.fileName = uploadFile.name
+  docForm.file_name = uploadFile.name
 }
 
 const uploadOnRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
   if (uploadFiles.length === 0) {
-    docForm.fileName = ''
+    docForm.file_name = ''
     docFile = null
   }
 }
@@ -144,9 +148,9 @@ const submitApi = async () => {
     formData.append('file', docFile)
   }
   // 遍历表单数据填充到formData
-  Object.keys(doc).forEach(key => {
-    formData.append(key, doc[key as keyof DocTableType])
-  })
+  for (const [key, value] of Object.entries(doc)) {
+    formData.append(key, value)
+  }
   // 请求后台提交表单
   if (isEdit) {
     await docEditApi(formData, { onUploadProgress: onProgress }).finally(() => (loading.value = false))
@@ -189,12 +193,12 @@ const onClosed = () => {
 </script>
 
 <template>
-  <BaseDialog v-model="visible" @closed="onClosed()">
+  <BaseDialog :title="title" v-model="visible" @closed="onClosed()">
     <el-form ref="docFormRef" :model="docForm" :rules="rules" label-width="120px" status-icon>
       <el-form-item label="文件名称" prop="name">
         <el-input v-model="docForm.name" />
       </el-form-item>
-      <el-form-item label="上传文件" prop="fileName">
+      <el-form-item label="上传文件" prop="file_name">
         <el-upload
           ref="uploadRef"
           action="#"

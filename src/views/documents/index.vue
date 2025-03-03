@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Search, RefreshRight, View, EditPen, Delete } from '@element-plus/icons-vue'
 import { onMounted, ref, reactive, toRaw } from 'vue'
-import { docPageApi, docDeleteApi } from '@/api/documents'
+import { docPageApi, docDeleteApi, docVectorAllApi } from '@/api/documents'
 import type { DocParamsType, DocTableType } from '@/api/documents/types'
 import writeForm from './writeForm.vue'
 
 const loading = ref(false)
+const tableLoadText = ref('加载中……')
 const dialog = reactive({
   writeFormVisible: false
 })
@@ -24,7 +25,7 @@ let currentRow: DocTableType | null = null
 
 onMounted(() => {
   // 页面加载完成时就调用获取一次table数据
-  // getTableList()
+  getTableList()
 })
 
 /**
@@ -35,15 +36,15 @@ async function getTableList(params?: DocParamsType) {
   loading.value = true
   const res = await docPageApi(
     params || {
-      pageNum: 1,
-      pageSize: 10
+      page_num: 1,
+      page_size: 10
     }
   ).finally(() => {
     loading.value = false
   })
 
-  tableState.pageNum = res.data.pageNum
-  tableState.pageSize = res.data.pageSize
+  tableState.pageNum = res.data.page_num
+  tableState.pageSize = res.data.page_size
   tableState.total = res.data.total
   tableDataList.value = res.data.list
 }
@@ -53,16 +54,16 @@ async function getTableList(params?: DocParamsType) {
  */
 const reloadTable = () => {
   const params: DocParamsType = {
-    pageNum: tableState.pageNum,
-    pageSize: tableState.pageSize
+    page_num: tableState.pageNum,
+    page_size: tableState.pageSize
   }
   getTableList(params)
 }
 
 const onSearch = () => {
   const params: DocParamsType = {
-    pageNum: 1,
-    pageSize: tableState.pageSize,
+    page_num: 1,
+    page_size: tableState.pageSize,
     name: searchForm.name
   }
   getTableList(params)
@@ -84,11 +85,45 @@ const onEdit = (index: number, row: DocTableType) => {
 
 const onDeleteRow = async (index: number, row: DocTableType) => {
   loading.value = true
-  await docDeleteApi(row.id).catch(err => {
-    ElMessage.success('删除失败！' + err.message)
+  try {
+    await docDeleteApi(row.id)
+    ElMessage.success('删除成功！')
+    reloadTable()
+  } catch (error: any) {
+    ElMessage.error('删除失败！' + error.message)
     loading.value = false
-  })
-  ElMessage.success('删除成功！')
+  }
+}
+
+/**
+ * 文档向量化事件
+ */
+const onVector = async () => {
+  if (tableDataList.value.length === 0) {
+    ElMessage.warning('请先上传文档。')
+    return
+  }
+
+  loading.value = true
+  tableLoadText.value = '向量化中……'
+  try {
+    await docVectorAllApi({ timeout: 600000 })
+    ElMessage.success('文档已全部向量化。')
+  } catch (error: any) {
+    const message = error.response?.data?.message || error.message
+    ElMessageBox.alert(`${message}`, '向量化失败！', {
+      type: 'error',
+      customStyle: {
+        'max-height': '500px',
+        'max-width': '50%',
+        width: 'auto',
+        overflow: 'auto'
+      }
+    })
+  }
+
+  loading.value = false
+  tableLoadText.value = '加载中……'
   reloadTable()
 }
 
@@ -118,22 +153,36 @@ const onOk = () => {
     <div class="card table-card">
       <div style="margin-bottom: 10px">
         <el-button type="primary" @click="onAdd">添加</el-button>
+        <el-popconfirm title="确定要将所有文档向量化吗？" width="250" placement="top" @confirm="onVector()">
+          <template #reference>
+            <el-button :disabled="tableDataList.length === 0">向量化文档</el-button>
+          </template>
+        </el-popconfirm>
       </div>
 
-      <el-table :data="tableDataList" v-loading="loading" element-loading-text="加载中..." :border="true" class="table-main">
+      <el-table :data="tableDataList" v-loading="loading" :element-loading-text="tableLoadText" :border="true" class="table-main">
         <el-table-column type="index" align="center" label="序号" width="60" />
         <el-table-column prop="name" align="center" label="文件名称">
           <template #default="scope">
-            <el-link type="primary" :href="'/api/documentQA/read/' + scope.row.id" target="_blank">
+            <el-link type="primary" :href="'/api/documents/read/' + scope.row.id" target="_blank">
               {{ scope.row.name }}
             </el-link>
           </template>
         </el-table-column>
+
+        <el-table-column prop="suffix" align="center" label="文档格式" width="110" />
+
+        <el-table-column prop="vector" align="center" label="向量化" width="200">
+          <template #default="scope">
+            <el-tag v-if="scope.row.vector === 'yes'">已向量化</el-tag>
+          </template>
+        </el-table-column>
+
         <el-table-column prop="date" align="center" label="上传时间" width="300" />
         <el-table-column align="center" label="操作" width="240">
           <template #default="scope">
             <el-button type="primary" link>
-              <el-link type="primary" :underline="false" :icon="View" :href="'/api/documentQA/read/' + scope.row.id" target="_blank">
+              <el-link type="primary" :underline="false" :icon="View" :href="'/api/documents/read/' + scope.row.id" target="_blank">
                 查看
               </el-link>
             </el-button>

@@ -39,6 +39,7 @@ declare module 'vue' {
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTag: typeof import('element-plus/es')['ElTag']
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
@@ -46,8 +47,8 @@ declare module 'vue' {
     HumanIcon: typeof import('./src/components/Icon/HumanIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Send: typeof import('./src/components/Icon/Send.vue')['default']
-    Stop: typeof import('./src/components/Icon/Stop.vue')['default']
+    SendIcon: typeof import('./src/components/Icon/SendIcon.vue')['default']
+    StopIcon: typeof import('./src/components/Icon/StopIcon.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

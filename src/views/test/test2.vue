@@ -5,7 +5,7 @@ import { ref } from 'vue'
 const data = ref()
 
 const onClick = async () => {
-  const response = await http.fetchPost('/hello', { name: 'a' })
+  const response = await http.get('/hello', { name: 'a' })
   data.value = response
 }
 </script>

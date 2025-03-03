@@ -34,6 +34,9 @@ export const checkStatus = (status: number, msg?: string | boolean, isAlert: boo
     case 408:
       message = '请求超时！请您稍后重试。'
       break
+    case 422:
+      message = '请求失败！无法处理的内容。'
+      break
     case 500:
       message = '服务器发生错误，请检查服务器。'
       break

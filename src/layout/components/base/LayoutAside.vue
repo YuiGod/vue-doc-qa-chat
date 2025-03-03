@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+
 const router = useRouter()
 const route = useRoute()
 
