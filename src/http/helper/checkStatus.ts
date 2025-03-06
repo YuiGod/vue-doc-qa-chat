@@ -64,7 +64,7 @@ export const checkStatus = (status: number, msg?: string | boolean, isAlert: boo
   }
 
   if ((typeof msg === 'boolean' && msg === true && isAlert) || (typeof msg !== 'boolean' && isAlert)) {
-    ElMessage.error(`状态码：${status}，${message}`)
+    ElMessage.error(`请求失败！状态码：${status}，${message}`)
   }
 
   return {

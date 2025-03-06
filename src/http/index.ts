@@ -14,7 +14,7 @@ export default {
    * @param config Axios config 配置
    * @returns `Promise<ResultData<T>>`
    */
-  get<T>(url: string, params?: object, config: CustomAxiosConfig = {}): Promise<T> {
+  get<T>(url: string, params?: object, config: CustomAxiosConfig = {}): Promise<ResultData<T>> {
     return axiosRequest.get(url, { params, ...config })
   },
   /**
@@ -24,7 +24,7 @@ export default {
    * @param config Axios config 配置
    * @returns `Promise<ResultData<T>>`
    */
-  post<T>(url: string, data?: object | string, config: CustomAxiosConfig = {}): Promise<T> {
+  post<T>(url: string, data?: object | string, config: CustomAxiosConfig = {}): Promise<ResultData<T>> {
     return axiosRequest.post(url, data, config)
   },
   /**

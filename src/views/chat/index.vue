@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import type { ChatSessionResponseType } from '@/api/chatSession/types'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { chatApi, chatCancelRequest, chatHistoryApi } from '@/api/chat'
+import { chatSessionsAddApi } from '@/api/chatSession'
+
 import HumanChat from './components/HumanChat.vue'
 import AssistantChat from './components/AssistantChat.vue'
-import { chatApi, chatCancelRequest } from '@/api/chat'
+import ChatHistory from './components/ChatHistory.vue'
+
+/** 配置组件名，使 KeepAlive 能找到该组件 */
+defineOptions({ name: 'Chat' })
 
 type Chat = {
   role: string
@@ -13,44 +20,53 @@ type Chat = {
   error?: boolean | string
 }
 
+/** 对话id */
+const chatSessionId = ref('')
+const chatTitle = ref('')
+
+/** 响应式对话，界面显示历史 */
+const chatting: Ref<Chat[]> = ref([])
+/** 用户输入消息 */
+const humanInput = ref('')
+
 const loading = ref(false)
 const disabled = ref(false)
+/** 历史会话列表框显隐 */
+const historyVisible = ref(false)
+
+/** 监听 assistant 是否正在流式输出文字 */
 const isStream = ref(false)
+/** 监听是否使用了鼠标滚轮 */
 const isWheelMove = ref(false)
-const humanInput = ref('')
-// 响应式对话，界面显示
-const chatting: Ref<Chat[]> = ref([])
+
 const chatMainRef = ref<HTMLDivElement>()
 
 /**
- * 对话标题
+ * 历史记录列表，item点击事件
+ * @param chatSession 会话记录
  */
-const chatTitle = computed(() => {
-  return chatting.value.find(item => item.role === 'user')?.content || ''
-})
+const onHistoryItemClick = async (chatSession: ChatSessionResponseType) => {
+  const response = await chatHistoryApi(chatSession.id)
+  chatting.value = response.data
+  chatTitle.value = chatSession.title
+  chatSessionId.value = chatSession.id
+  scrollToButtom(chatMainRef.value!)
+}
 
 /**
- * 将对话添加到对话历史中
- * @param chatting 对话历史
- * @param popChat 加上新添加的对话
+ * 会话重命名标题后的回调
  */
-const getHistory = (chatting: Chat[], popChat?: Chat): Chat[] => {
-  const chatHistory: Chat[] = []
-  for (const chat of chatting) {
-    chatHistory.push({
-      role: chat.role,
-      content: chat.content
-    })
+const onHistoryItemRename = (title: string, id: string) => {
+  // 如果重命名的会话记录和当前正在聊天的会话相同，则更新标题
+  if (chatSessionId.value === id) {
+    chatTitle.value = title
   }
+}
 
-  if (popChat) {
-    chatHistory.push({
-      role: popChat.role,
-      content: popChat.content
-    })
+const onHistoryItemDelete = (id: string) => {
+  if (chatSessionId.value === id) {
+    onRestartNewChat()
   }
-
-  return chatHistory
 }
 
 /**
@@ -61,8 +77,32 @@ const onSubmit = async () => {
     ElMessage.warning('请输入对话内容。')
     return
   }
+  if (!chatSessionId.value) {
+    disabled.value = true
+    loading.value = true
+
+    try {
+      const res = await chatSessionsAddApi({ title: humanInput.value })
+      chatSessionId.value = res.data.id
+      chatTitle.value = res.data.title
+      startChatting()
+    } catch {
+      disabled.value = false
+      loading.value = false
+    }
+  } else {
+    startChatting()
+  }
+}
+
+/**
+ * 开始对话，流式响应
+ */
+function startChatting() {
   disabled.value = true
   loading.value = true
+  isWheelMove.value = false
+  scrollToButtom(chatMainRef.value!)
 
   const userChat = ref<Chat>({
     role: 'user',
@@ -77,21 +117,20 @@ const onSubmit = async () => {
     error: false
   })
 
-  const history = getHistory(chatting.value, userChat.value)
+  // 请求参数
   const data = {
     model: 'deepseek-r1:7b',
-    messages: history,
+    messages: {
+      role: userChat.value.role,
+      content: userChat.value.content
+    },
+    chat_session_id: chatSessionId.value,
     stream: true
   }
-
-  isWheelMove.value = false
-
-  scrollToButtom(chatMainRef.value!)
-
   let isThinking = false
   let buffer = ''
   // 请求后台 chat
-  await chatApi(
+  chatApi(
     data,
     () => {
       humanInput.value = ''
@@ -115,7 +154,6 @@ const onSubmit = async () => {
           isThinking = true
           continue
         }
-
         if (content === '</think>') {
           isThinking = false
           continue
@@ -142,15 +180,17 @@ const onSubmit = async () => {
         }
       }
     }
-  ).catch(error => {
-    userChat.value.error = error.message
-    assistantChat.value.error = error.message
-  })
-
-  disabled.value = false
-  loading.value = false
-  isStream.value = false
-  assistantChat.value.isStream = false
+  )
+    .catch(error => {
+      userChat.value.error = error.message
+      assistantChat.value.error = error.message
+    })
+    .finally(() => {
+      disabled.value = false
+      loading.value = false
+      isStream.value = false
+      assistantChat.value.isStream = false
+    })
 }
 
 /**
@@ -159,11 +199,12 @@ const onSubmit = async () => {
  */
 const inputKeyboard = (event: KeyboardEvent | Event) => {
   const e = event as KeyboardEvent
+  // Shift + Enter 换行
   if (e.key == 'Enter' && e.shiftKey) {
     return
   }
+  // Ctrl + Enter 换行
   if (e.key == 'Enter' && e.ctrlKey) {
-    // Ctrl + Enter 换行
     humanInput.value = humanInput.value + '\n'
   } else if (e.key == 'Enter') {
     // Enter 提交
@@ -183,6 +224,7 @@ const onCancelRequest = () => {
  * 开启新对话
  */
 const onRestartNewChat = () => {
+  chatSessionId.value = ''
   humanInput.value = ''
   loading.value = false
   disabled.value = false
@@ -297,7 +339,26 @@ function scrollToButtom(div: Element | null) {
               <el-text type="info" size="small">内容由 AI 生成，请仔细甄别</el-text>
               <div class="send-controls-extra">
                 <el-button-group>
-                  <el-button round>历史对话</el-button>
+                  <el-popover
+                    :popper-style="{ borderRadius: '26px' }"
+                    :visible="historyVisible"
+                    placement="top-end"
+                    :width="350"
+                    trigger="click"
+                    :persistent="false"
+                  >
+                    <template #reference>
+                      <el-button round @click="historyVisible = !historyVisible">历史对话</el-button>
+                    </template>
+                    <ChatHistory
+                      v-model:visible="historyVisible"
+                      v-model:active-id="chatSessionId"
+                      @item-click="onHistoryItemClick"
+                      @rename="onHistoryItemRename"
+                      @delete="onHistoryItemDelete"
+                    />
+                  </el-popover>
+
                   <el-button round type="primary" @click="onRestartNewChat">新对话</el-button>
                 </el-button-group>
               </div>

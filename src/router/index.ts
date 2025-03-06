@@ -14,16 +14,17 @@ const router = createRouter({
       children: [
         {
           path: '/chat',
-          name: 'chat',
+          name: 'Chat',
           meta: {
             title: '聊天',
-            icon: 'ChatDotRound'
+            icon: 'ChatDotRound',
+            keepAlive: true
           },
           component: () => import('@/views/chat/index.vue')
         },
         {
           path: '/documents',
-          name: 'documents',
+          name: 'Documents',
           meta: {
             title: '文档管理',
             icon: 'FolderOpened'
@@ -32,7 +33,7 @@ const router = createRouter({
         },
         {
           path: '/test',
-          name: 'test',
+          name: 'Test',
           meta: {
             title: 'md主题预览',
             icon: 'Tickets'
@@ -41,7 +42,7 @@ const router = createRouter({
         },
         {
           path: '/test2',
-          name: 'test2',
+          name: 'Test2',
           meta: {
             title: '测试2',
             icon: 'Warning'

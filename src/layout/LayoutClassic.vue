@@ -18,7 +18,11 @@ import LayoutFooter from './components/base/LayoutFooter.vue'
       <el-main>
         <el-scrollbar class="layout-scrollbar">
           <div class="layout-main">
-            <router-view></router-view>
+            <router-view v-slot="{ Component }">
+              <keep-alive include="Chat">
+                <component :is="Component" />
+              </keep-alive>
+            </router-view>
           </div>
           <LayoutFooter class="el-footer" />
         </el-scrollbar>

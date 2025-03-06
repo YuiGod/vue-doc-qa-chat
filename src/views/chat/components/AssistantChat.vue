@@ -75,14 +75,24 @@ function toggle() {
       <div v-if="hasThinkCard">
         <el-button class="thinking-button" style="border-radius: 6px" type="primary" text bg size="small" @click="toggle()">
           <span v-if="isStream">思考中……</span>
-          <span v-else>已思考（用时{{ streamtime.diffTime }}秒）</span>
+          <span v-else>已思考（用时 {{ streamtime.diffTime }} 秒）</span>
           <el-icon class="el-icon--right" v-if="isThinkHidden"><ArrowDown /></el-icon>
           <el-icon class="el-icon--right" v-else><ArrowUp /></el-icon>
         </el-button>
         <div ref="box" class="think-container" :class="{ 'think-hidden': isThinkHidden }">
           <section class="trigger-section">
             <div class="think">{{ think }}</div>
-            <el-button class="thinking-button" type="primary" text bg circle icon="ArrowUp" size="small" @click="toggle()"></el-button>
+            <el-button
+              v-if="think"
+              class="thinking-button"
+              type="primary"
+              text
+              bg
+              circle
+              icon="ArrowUp"
+              size="small"
+              @click="toggle()"
+            ></el-button>
           </section>
         </div>
       </div>

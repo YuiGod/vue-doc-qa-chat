@@ -34,15 +34,8 @@ onMounted(() => {
  */
 async function getTableList(params?: DocParamsType) {
   loading.value = true
-  const res = await docPageApi(
-    params || {
-      page_num: 1,
-      page_size: 10
-    }
-  ).finally(() => {
-    loading.value = false
-  })
 
+  const res = await docPageApi(params || { page_num: 1, page_size: 10 }).finally(() => (loading.value = false))
   tableState.pageNum = res.data.page_num
   tableState.pageSize = res.data.page_size
   tableState.total = res.data.total
@@ -85,14 +78,9 @@ const onEdit = (index: number, row: DocTableType) => {
 
 const onDeleteRow = async (index: number, row: DocTableType) => {
   loading.value = true
-  try {
-    await docDeleteApi(row.id)
-    ElMessage.success('删除成功！')
-    reloadTable()
-  } catch (error: any) {
-    ElMessage.error('删除失败！' + error.message)
-    loading.value = false
-  }
+  await docDeleteApi(row.id).finally(() => (loading.value = false))
+  ElMessage.success('删除成功！')
+  reloadTable()
 }
 
 /**
