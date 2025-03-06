@@ -1,6 +1,6 @@
 import http from '@/http'
 import type { ChatHistoryResponseType, ChatRequestType, ChatResponseType } from './types'
-import type { CustomAxiosConfig, OnReady, OnStream } from '@/http/types'
+import type { OnReady, OnStream } from '@/http/types'
 
 /**
  * Fetch 请求，chat对话内容

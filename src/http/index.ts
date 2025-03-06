@@ -50,7 +50,7 @@ export default {
   /**
    * Axios download 下载请求，responseType: blob
    * @param url url
-   * @param params data 请求参数
+   * @param data data 请求参数
    * @param config Axios config 配置
    * @returns `Promise<BlobPart>`
    */

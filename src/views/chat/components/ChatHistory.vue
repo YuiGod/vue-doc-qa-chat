@@ -9,12 +9,14 @@ const activeId = defineModel('activeId')
 
 /** emit */
 const emit = defineEmits<{
+  /** 列表Item点击事件 */
   itemClick: [chatSession: ChatSessionResponseType]
+  /** 重命名提交成功触发事件 */
   rename: [title: string, chatSessionId: string]
+  /** 会话删除成功触发事件 */
   delete: [chatSessionId: string]
 }>()
 
-const hoverId = ref('')
 const loading = ref(false)
 const chatSessionsMap = ref(new Map<string, ChatSessionResponseType[]>())
 
@@ -141,29 +143,28 @@ const onCommand = (command: { index: number; chatSession: ChatSessionResponseTyp
             <div class="history-label">{{ key }}</div>
 
             <template v-for="item in sessionList" :key="item.id">
-              <div
-                class="history-item"
-                :class="{ active: activeId === item.id }"
-                @mouseenter="hoverId = item.id"
-                @mouseleave="hoverId = ''"
-              >
-                <span class="item-text" @click="onItemClick(item)">{{ item.title }}</span>
-                <el-dropdown placement="bottom-start" trigger="click" @command="onCommand">
-                  <el-button v-show="hoverId === item.id || activeId === item.id" class="extra" size="small" type="warning" plain round>
-                    <el-icon><More /></el-icon>
-                  </el-button>
+              <div class="history-item" :class="{ active: activeId === item.id }">
+                <div class="item-content">
+                  <span class="item-text" @click="onItemClick(item)">{{ item.title }}</span>
+                  <div class="placeholder" :class="{ active: activeId === item.id }"></div>
 
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item :command="{ index: 1, chatSession: item }">
-                        <el-icon><Edit /></el-icon>重命名
-                      </el-dropdown-item>
-                      <el-dropdown-item :command="{ index: 2, chatSession: item }">
-                        <el-icon><Delete /></el-icon>删除
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
+                  <el-dropdown placement="bottom-start" trigger="click" @command="onCommand">
+                    <el-button class="extra" :class="{ active: activeId === item.id }" size="small" type="warning" plain round>
+                      <el-icon><More /></el-icon>
+                    </el-button>
+
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item :command="{ index: 1, chatSession: item }">
+                          <el-icon><Edit /></el-icon>重命名
+                        </el-dropdown-item>
+                        <el-dropdown-item :command="{ index: 2, chatSession: item }">
+                          <el-icon><Delete /></el-icon>删除
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
               </div>
             </template>
           </template>
@@ -197,8 +198,7 @@ const onCommand = (command: { index: number; chatSession: ChatSessionResponseTyp
     }
 
     .history-item {
-      display: flex;
-      align-items: center;
+      position: relative;
       height: 40px;
       padding-left: 10px;
       margin-right: 10px;
@@ -211,17 +211,46 @@ const onCommand = (command: { index: number; chatSession: ChatSessionResponseTyp
         background-color: var(--el-menu-hover-bg-color);
       }
 
-      .item-text {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: var(--el-text-color-primary);
-        white-space: nowrap;
+      .item-content {
+        display: flex;
+        align-items: center;
+        height: 100%;
+
+        .item-text {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: var(--el-text-color-primary);
+          white-space: nowrap;
+        }
+
+        .placeholder {
+          width: 0;
+        }
+
+        .placeholder.active {
+          width: 50px;
+        }
       }
 
       .extra {
+        position: absolute;
+        top: -12px;
+        right: 10px;
         width: 30px;
-        margin: 0 10px;
+        opacity: 0;
+      }
+
+      .extra.active {
+        opacity: 1;
+      }
+
+      &:hover .placeholder {
+        width: 50px;
+      }
+
+      &:hover .extra {
+        opacity: 1;
       }
     }
 

@@ -32,22 +32,13 @@ const router = createRouter({
           component: () => import('@/views/documents/index.vue')
         },
         {
-          path: '/test',
-          name: 'Test',
+          path: '/md-preview',
+          name: 'MdPreview',
           meta: {
             title: 'md主题预览',
             icon: 'Tickets'
           },
           component: () => import('@/views/test/index.vue')
-        },
-        {
-          path: '/test2',
-          name: 'Test2',
-          meta: {
-            title: '测试2',
-            icon: 'Warning'
-          },
-          component: () => import('@/views/test/test2.vue')
         }
       ]
     }

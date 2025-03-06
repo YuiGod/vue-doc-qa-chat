@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { Search, RefreshRight, View, EditPen, Delete } from '@element-plus/icons-vue'
-import { onMounted, ref, reactive, toRaw } from 'vue'
+import { Search, RefreshRight, View, EditPen, Delete, QuestionFilled } from '@element-plus/icons-vue'
+import { onMounted, ref, reactive, toRaw, markRaw } from 'vue'
 import { docPageApi, docDeleteApi, docVectorAllApi } from '@/api/documents'
 import type { DocParamsType, DocTableType } from '@/api/documents/types'
 import writeForm from './writeForm.vue'
 
 const loading = ref(false)
 const tableLoadText = ref('加载中……')
+/** 添加/编辑弹窗表单 */
 const dialog = reactive({
   writeFormVisible: false
 })
@@ -81,19 +82,44 @@ const onDeleteRow = async (index: number, row: DocTableType) => {
   await docDeleteApi(row.id).finally(() => (loading.value = false))
   ElMessage.success('删除成功！')
   reloadTable()
+
+  ElMessageBox.confirm('删除的文件后，向量数据库还存在该文件的向量化数据。是否重新向量化数据？', '删除文件成功！是否重新向量化？', {
+    type: 'info',
+    icon: markRaw(QuestionFilled)
+  })
+    .then(() => {
+      vectorAll()
+    })
+    .catch(() => {})
 }
 
 /**
  * 文档向量化事件
  */
-const onVector = async () => {
+const onVectorClick = async () => {
+  //确定要将所有文档向量化吗？
   if (tableDataList.value.length === 0) {
     ElMessage.warning('请先上传文档。')
     return
   }
 
+  ElMessageBox.confirm('确定要将所有文档向量化吗？', '向量化文档？', {
+    type: 'info',
+    icon: markRaw(QuestionFilled)
+  })
+    .then(async () => {
+      vectorAll()
+    })
+    .catch(() => {})
+}
+
+/**
+ * 文档向量化操作
+ */
+async function vectorAll() {
   loading.value = true
   tableLoadText.value = '向量化中……'
+
   try {
     await docVectorAllApi({ timeout: 600000 })
     ElMessage.success('文档已全部向量化。')
@@ -141,11 +167,7 @@ const onOk = () => {
     <div class="card table-card">
       <div style="margin-bottom: 10px">
         <el-button type="primary" @click="onAdd">添加</el-button>
-        <el-popconfirm title="确定要将所有文档向量化吗？" width="250" placement="top" @confirm="onVector()">
-          <template #reference>
-            <el-button :disabled="tableDataList.length === 0">向量化文档</el-button>
-          </template>
-        </el-popconfirm>
+        <el-button :disabled="tableDataList.length === 0" @click="onVectorClick()">向量化文档</el-button>
       </div>
 
       <el-table :data="tableDataList" v-loading="loading" :element-loading-text="tableLoadText" :border="true" class="table-main">
