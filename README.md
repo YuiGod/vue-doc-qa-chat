@@ -118,7 +118,7 @@ $ npm run dev
 - 请求类型：***POST***
 - Request data  请求体：
 
-```json
+```
 {
   "model": "deepseek-r1:7b", // 模型名称
   "stream": true, // 开启流式响应
@@ -131,7 +131,7 @@ $ npm run dev
 
 - Responses 响应体：返回 JSON 对象流。`content-type: application/x-ndjson`
 
-```json
+```
 // json 流未完成时
 {
   "model": "deepseek-r1:7b", // 模型名称
@@ -163,7 +163,7 @@ $ npm run dev
 - 请求类型：***GET***
 - Request params 参数：
 
-```json
+```
 {
   "id": "cae1e775-31b2-44a8-b5d3-873bbabfff4c" // 必填，会话 id
   "title": "标题" // 可选，会话标题
@@ -171,7 +171,7 @@ $ npm run dev
 ```
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "响应成功！",
@@ -204,7 +204,7 @@ $ npm run dev
 - 请求类型：***GET***
 - Request params 参数：无
 - Responses 响应体：`application/json`
-```json
+```
 {
   "code": 200,
   "message": "响应成功！",
@@ -229,7 +229,7 @@ $ npm run dev
 - 请求类型：***POST***
 - Request data  请求体：
 
-```json
+```
 {
   "title": "标题" // 必填，会话标题
 }
@@ -237,7 +237,7 @@ $ npm run dev
 
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "响应成功！",
@@ -255,7 +255,7 @@ $ npm run dev
 - 请求类型：***PUT***
 - Request data 请求体：
 
-```json
+```
 {
   "id": "cae1e775-31b2-44a8-b5d3-873bbabfff4c", // 必填，会话 id
   "title": "标题" // 必填，会话标题
@@ -264,7 +264,7 @@ $ npm run dev
 
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "响应成功！",
@@ -282,7 +282,7 @@ $ npm run dev
 - 请求类型：***DELETE***
 - Request data 请求体：
 
-```json
+```
 {
   "id": "cae1e775-31b2-44a8-b5d3-873bbabfff4c" // 必填，会话 id
 }
@@ -290,7 +290,7 @@ $ npm run dev
 
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "响应成功！",
@@ -305,7 +305,7 @@ $ npm run dev
 - 请求类型：***GET***
 - Request params 参数：
 
-```json
+```
 {
   "page_num": 1
         "page_size": 10,
@@ -322,7 +322,7 @@ $ npm run dev
 
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "响应成功！",
@@ -351,7 +351,7 @@ $ npm run dev
 - 请求类型：***POST***
 - Request FormData 请求体：表单数据
 
-```json
+```
 {
   "name": "FFF团", // 必填，文档名称
   "flie": "blob" // 必带，二进制文件
@@ -360,7 +360,7 @@ $ npm run dev
 
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "添加成功！",
@@ -374,7 +374,7 @@ $ npm run dev
 - 请求类型：***PUT***
 - Request FormData 请求体：表单数据
 
-```json
+```
 {
   "name": "FFF团",
   "flie": "blob" // 二进制文件
@@ -382,7 +382,7 @@ $ npm run dev
 ```
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "更新成功！",
@@ -396,14 +396,14 @@ $ npm run dev
 - 请求类型：***DELETE***
 - Request data 请求体：
 
-```json
+```
 {
   "id": "6b364b00-b7d7-408b-95f3-646ca226133f" // 文档 id
 }
 ```
 - Responses 响应体：`application/json`
 
-```json
+```
 {
   "code": 200,
   "message": "删除成功！",
@@ -417,7 +417,7 @@ $ npm run dev
 - 请求类型：***GET***
 - Request data 请求体：
 
-```json
+```
 {
   "id": "6b364b00-b7d7-408b-95f3-646ca226133f" // 文档 id
 }
@@ -436,10 +436,11 @@ Blob
 - Request data 请求体：无
 - Responses 响应体：根据不同文件后缀，返回不同的请求头
 
-```json
+```
 {
   "code": 200,
   "message": "删除成功！",
   "data": null
 }
 ```
+
