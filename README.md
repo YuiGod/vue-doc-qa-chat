@@ -1,7 +1,3 @@
----
-typora-copy-images-to: ./images
----
-
 # 📃 **关于vue-doc-qa-chat**
 
 基于  [🦜️🔗 LangChain](https://github.com/hwchase17/langchain) 与  DeepSeek R1 语言模型的本地知识库问答。
