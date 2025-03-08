@@ -31,7 +31,7 @@ $ npm run dev
 ```
 
 ## 项目预览
-
+![项目预览](./public/images/chat_preview.png)
 ![preview_1](./public/images/preview_1.gif)
 ![preview_2](./public/images/preview_2.gif)
 ![preview_3](./public/images/preview_3.gif)
