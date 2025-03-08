@@ -32,9 +32,10 @@ $ npm run dev
 
 ## 项目预览
 
-[视频预览](./public/images/preview.mp4)
+![preview_1](./public/images/preview_1.gif)
+![preview_2](./public/images/preview_2.gif)
+![preview_3](./public/images/preview_3.gif)
 
-![项目预览转存失败，建议直接上传图片文件](./public/images/chat_preview.png)
 
 ## 系列文章
 
