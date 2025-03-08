@@ -435,7 +435,7 @@ Blob
 
 - 请求类型：***GET***
 - Request data 请求体：无
-- Responses 响应体：根据不同文件后缀，返回不同的请求头
+- Responses 响应体：`application/json`
 
 ```
 {
