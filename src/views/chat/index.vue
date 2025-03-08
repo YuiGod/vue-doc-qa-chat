@@ -225,6 +225,7 @@ const onCancelRequest = () => {
  */
 const onRestartNewChat = () => {
   chatSessionId.value = ''
+  chatTitle.value = ''
   humanInput.value = ''
   loading.value = false
   disabled.value = false
@@ -286,7 +287,9 @@ function scrollToButtom(div: Element | null) {
 <template>
   <div class="chat-container">
     <div class="chat-header">
-      <span class="title">{{ chatTitle }}</span>
+      <el-tooltip class="box-item" :content="chatTitle" placement="bottom">
+        <span class="title">{{ chatTitle }}</span>
+      </el-tooltip>
     </div>
 
     <div ref="chatMainRef" class="chat-main">

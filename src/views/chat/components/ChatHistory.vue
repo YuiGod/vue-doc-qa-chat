@@ -88,6 +88,7 @@ const onCommand = (command: { index: number; chatSession: ChatSessionResponseTyp
 
   if (index === 1) {
     ElMessageBox.prompt('', '重命名', {
+      inputValue: chatSession.title,
       inputPlaceholder: '请输入标题……',
       inputPattern: /^.+$/,
       inputErrorMessage: '文本不能为空！',
@@ -145,7 +146,15 @@ const onCommand = (command: { index: number; chatSession: ChatSessionResponseTyp
             <template v-for="item in sessionList" :key="item.id">
               <div class="history-item" :class="{ active: activeId === item.id }">
                 <div class="item-content">
-                  <span class="item-text" @click="onItemClick(item)">{{ item.title }}</span>
+                  <el-tooltip
+                    class="box-item"
+                    :disabled="!item.title || item.title.length < 15"
+                    :content="item.title"
+                    placement="top-start"
+                  >
+                    <span class="item-text" @click="onItemClick(item)">{{ item.title }}</span>
+                  </el-tooltip>
+
                   <div class="placeholder" :class="{ active: activeId === item.id }"></div>
 
                   <el-dropdown placement="bottom-start" trigger="click" @command="onCommand">

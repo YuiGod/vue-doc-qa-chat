@@ -1,5 +1,9 @@
 import type { CustomAbortRequestConfig } from '../types'
 
+/**
+ * AbortController 请求管理，用于取消请求操作
+ */
+
 // 声明一个 Map 用于存储每个 请求的标识 和对应 AbortController
 const pendingMap = new Map<string, AbortController>()
 
