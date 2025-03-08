@@ -5,3 +5,4 @@ build/
 *.bundle.js
 *.log
 src/styles/markdown/
+**/*.md

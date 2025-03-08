@@ -34,6 +34,9 @@ $ npm run dev
 
 ## 项目预览
 
+![项目预览](./public/images/preview.mp4)
+
+
 ![项目预览](./public/images/chat_preview.png)
 
 
