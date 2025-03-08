@@ -2,7 +2,7 @@
 
 基于  [🦜️🔗 LangChain](https://github.com/hwchase17/langchain) 与  DeepSeek R1 语言模型的本地知识库问答。
 
-本项是本地知识库问答应用的 web 前端模块，使用 vue3 + typescript + vite + elementplus 框架。
+本项目是本地知识库问答应用的 web 前端模块，使用 vue3 + typescript + vite + elementplus 框架。
 
 目前实现前端chat聊天网页，上传文档主要功能。后续会系统学习 langchain ，逐步添加更多的功能。
 
