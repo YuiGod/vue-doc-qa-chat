@@ -27,7 +27,7 @@ $ npm run dev
 ```
 
 ## 项目预览
-> 因为git压缩了帧率，看起来不够流畅。可点击这里下载预览视频观看：[预览视频](./public/images/preview.mp4)
+> 因为git压缩了帧率，看起来不够流畅。可点击这里下载预览视频观看：[预览视频](blob:https://github.com/c075280b-3d31-4670-9af0-09bc572af9be)
 
 
 ![项目预览](./public/images/chat_preview.png)
