@@ -32,7 +32,7 @@ export interface CustomAxiosInterceptorsConfig<D = any> extends CustomAxiosBaseC
  * fetch 扩展配置参数，继承 fetch 原有 config
  */
 export interface FetchConfig<D = any> extends RequestInit {
-  /** `baseURL` 将自动加在 `url` 前面，除非 `url` 是一个绝对 URL。它可以通过设置一个 `baseURL` 便于为 axios 实例的方法传递相对 URL */
+  /** `baseURL` 将自动加在 `url` 前面，如果 `url` 是一个绝对 URL，则会忽略 `baseURL`。 */
   baseURL?: string
   /** `url` 是用于请求的服务器 URL */
   url?: string
